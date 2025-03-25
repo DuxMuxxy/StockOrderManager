@@ -44,7 +44,7 @@ with app.app_context():
     db.create_all()
     
     # Import utility functions
-    from utils import get_current_inventory, get_current_order_period, get_orders_for_period
+    from utils import get_current_inventory, get_current_order_period, get_orders_for_period, toggle_delivery_status
 
 # Routes
 @app.route('/')
@@ -297,6 +297,23 @@ def delete_order(order_id):
     flash('Order deleted successfully', 'success')
     return redirect(url_for('orders'))
 
+@app.route('/orders/<int:order_id>/toggle-delivery', methods=['POST'])
+def toggle_order_delivery(order_id):
+    order, error = toggle_delivery_status(order_id)
+    
+    if error:
+        flash(error, 'danger')
+    else:
+        status = "Delivered" if order.is_delivered else "Not Delivered"
+        flash(f'Order by {order.user_name} marked as {status}', 'success')
+    
+    # Redirect back to the orders page with the same period filter
+    period_id = request.args.get('period_id')
+    if period_id:
+        return redirect(url_for('orders', period_id=period_id))
+    else:
+        return redirect(url_for('orders'))
+
 # API endpoints
 @app.route('/api/inventory', methods=['GET'])
 def api_inventory():
@@ -522,3 +539,18 @@ def api_delete_order(order_id):
     db.session.commit()
     
     return jsonify({"success": True}), 200
+
+@app.route('/api/orders/<int:order_id>/toggle-delivery', methods=['POST'])
+def api_toggle_order_delivery(order_id):
+    order, error = toggle_delivery_status(order_id)
+    
+    if error:
+        return jsonify({"error": error}), 400
+    
+    return jsonify({
+        'id': order.id,
+        'user_id': order.user_id,
+        'user_name': order.user_name,
+        'is_delivered': order.is_delivered,
+        'order_period_id': order.order_period_id
+    })

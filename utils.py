@@ -213,3 +213,27 @@ def update_inventory(product_id, quantity):
     db.session.commit()
     
     return inventory_item, None
+
+def toggle_delivery_status(order_id):
+    """
+    Toggles the delivery status of an order.
+    
+    Args:
+        order_id (int): ID of the order to toggle
+        
+    Returns:
+        Order: The updated order
+        str: Error message if any
+    """
+    from app import db
+    
+    order = Order.query.get(order_id)
+    
+    if not order:
+        return None, "Order not found"
+    
+    # Toggle the delivery status
+    order.is_delivered = not order.is_delivered
+    db.session.commit()
+    
+    return order, None

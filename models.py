@@ -56,6 +56,7 @@ class Order(db.Model):
     user_id = db.Column(db.String(100), nullable=False)  # Could be Discord ID or other identifier
     user_name = db.Column(db.String(100), nullable=False)  # Display name
     order_period_id = db.Column(db.Integer, db.ForeignKey('order_period.id'), nullable=False)
+    is_delivered = db.Column(db.Boolean, default=False)  # Flag to track delivery status
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -67,7 +68,8 @@ class Order(db.Model):
     )
     
     def __repr__(self):
-        return f"<Order {self.id} by {self.user_name}>"
+        delivery_status = "Delivered" if self.is_delivered else "Not Delivered"
+        return f"<Order {self.id} by {self.user_name} ({delivery_status})>"
 
 class OrderItem(db.Model):
     """
