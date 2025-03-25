@@ -10,9 +10,22 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
+/* Table styles for dark theme */
+.table {
+    color: #fff;
+}
+
+.table tbody tr td {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.table thead tr th {
+    color: #fff;
+}
+
 /* Table hover enhancement */
 .table-hover tbody tr:hover {
-    background-color: rgba(var(--bs-info-rgb), 0.1);
+    background-color: rgba(var(--bs-info-rgb), 0.2);
 }
 
 /* Custom badge styles */
@@ -58,6 +71,20 @@ footer {
 .dropdown-item.active, 
 .dropdown-item:active {
     background-color: var(--bs-info);
+}
+
+/* List group styling for dark theme */
+.list-group-item {
+    background-color: #2a2a2a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.list-group-item code {
+    color: var(--bs-info);
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+    padding: 2px 4px;
+    border-radius: 3px;
 }
 
 /* Navbar active item */
