@@ -1,0 +1,85 @@
+/* Custom styles for the inventory management system */
+
+/* Card hover effect */
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Table hover enhancement */
+.table-hover tbody tr:hover {
+    background-color: rgba(var(--bs-info-rgb), 0.1);
+}
+
+/* Custom badge styles */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Button group spacing */
+.btn-group .btn {
+    margin-right: 2px;
+}
+
+/* Alert styling */
+.alert {
+    border-radius: 0.375rem;
+}
+
+/* Footer styling */
+footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 2rem;
+}
+
+/* Card header icon alignment */
+.card-header i {
+    vertical-align: middle;
+}
+
+/* Form control focus */
+.form-control:focus {
+    border-color: var(--bs-info);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-info-rgb), 0.25);
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border-radius: 0.375rem;
+    padding: 0.5rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dropdown-item.active, 
+.dropdown-item:active {
+    background-color: var(--bs-info);
+}
+
+/* Navbar active item */
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--bs-info);
+    font-weight: 500;
+}
+
+/* Container padding */
+.container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* Responsive table for small screens */
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}

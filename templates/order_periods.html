@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Periods - Inventory & Order Management{% endblock %}
+
+{% block page_title %}Order Period Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-primary mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-calendar-alt me-2"></i>Order Periods
+            </div>
+            <div class="card-body">
+                {% if periods %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Month/Year</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for period in periods %}
+                            <tr{% if period.is_open %} class="table-success"{% endif %}>
+                                <td>{{ period.id }}</td>
+                                <td>{{ period.month }}/{{ period.year }}</td>
+                                <td>
+                                    {% if period.is_open %}
+                                    <span class="badge bg-success">OPEN</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">CLOSED</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ period.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <form action="{{ url_for('toggle_order_period', period_id=period.id) }}" method="post" class="d-inline">
+                                            <button type="submit" class="btn btn-sm {% if period.is_open %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                {% if period.is_open %}
+                                                <i class="fas fa-lock me-1"></i> Close
+                                                {% else %}
+                                                <i class="fas fa-lock-open me-1"></i> Open
+                                                {% endif %}
+                                            </button>
+                                        </form>
+                                        <a href="{{ url_for('orders', period_id=period.id) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-eye me-1"></i> View Orders
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No order periods found. Create a new order period to get started.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-plus-circle me-2"></i>Create New Order Period
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('create_order_period') }}" method="post">
+                    <div class="mb-3">
+                        <label for="month" class="form-label">Month (1-12)</label>
+                        <input type="number" class="form-control" id="month" name="month" 
+                               min="1" max="12" value="{{ (current_period.month % 12) + 1 if current_period else 1 }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <input type="number" class="form-control" id="year" name="year" 
+                               min="2000" max="2100" value="{{ current_period.year if current_period and (current_period.month % 12) + 1 != 1 else (current_period.year + 1 if current_period else 2023) }}" required>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> Creating a new order period will automatically close any currently open period.
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-calendar-plus me-2"></i>Create and Open Period
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-info-circle me-2"></i>Information
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Managing Order Periods</h5>
+                <p class="card-text">
+                    Use this page to manage the monthly order periods.
+                </p>
+                <ul>
+                    <li>Only one order period can be <strong>open</strong> at a time</li>
+                    <li>Orders can only be added or modified for the currently <strong>open</strong> period</li>
+                    <li>Use the <strong>Open/Close</strong> button to toggle a period's status</li>
+                    <li>View orders for any period by clicking <strong>View Orders</strong></li>
+                </ul>
+                
+                <div class="alert alert-light border mt-3">
+                    <strong>Note:</strong> You can also use the Discord bot commands <code>!open_month MM/YYYY</code> and <code>!toggle_month MM/YYYY</code> to manage order periods.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

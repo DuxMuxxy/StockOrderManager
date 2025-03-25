@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Inventory & Order Management{% endblock %}
+
+{% block page_title %}Welcome to the Inventory & Order Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4 border-light">
+            <div class="card-body">
+                <h2 class="card-title">About This System</h2>
+                <p class="card-text">
+                    This system provides tools for managing inventory and monthly orders through both a web interface and a Discord bot.
+                </p>
+                <p class="card-text">
+                    The system allows you to:
+                </p>
+                <ul>
+                    <li>Monitor current inventory levels</li>
+                    <li>View current and past monthly orders</li>
+                    <li>Manually control order periods (open/close monthly ordering)</li>
+                    <li>Add, modify, and delete orders</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4 border-info">
+                    <div class="card-header bg-info text-white">
+                        <i class="fas fa-warehouse me-2"></i>Inventory Management
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            View and update your current inventory levels.
+                        </p>
+                        <a href="{{ url_for('inventory') }}" class="btn btn-outline-info">Go to Inventory</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-shopping-cart me-2"></i>Order Management
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            View, add, modify, and delete orders for the current month.
+                        </p>
+                        <a href="{{ url_for('orders') }}" class="btn btn-outline-success">Go to Orders</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-calendar-alt me-2"></i>Order Periods
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Manage monthly order periods. Open and close ordering for specific months.
+                </p>
+                <a href="{{ url_for('order_periods') }}" class="btn btn-outline-primary">Manage Order Periods</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4 border-light">
+            <div class="card-header bg-dark">
+                <i class="fab fa-discord me-2"></i>Discord Bot
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Available Commands</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><code>!inventory</code> - Show current inventory</li>
+                    <li class="list-group-item"><code>!current_orders</code> - Show current month's orders</li>
+                    <li class="list-group-item"><code>!past_orders MM/YYYY</code> - Show past month's orders</li>
+                    <li class="list-group-item"><code>!order</code> - Place an order for the current month</li>
+                    <li class="list-group-item"><code>!cancel_order</code> - Cancel your order for the current month</li>
+                    <li class="list-group-item"><code>!products</code> - List all available products</li>
+                </ul>
+                <h6 class="mt-3">Admin Commands</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><code>!open_month MM/YYYY</code> - Open a new order month</li>
+                    <li class="list-group-item"><code>!toggle_month MM/YYYY</code> - Open/close an order month</li>
+                    <li class="list-group-item"><code>!update_stock ID QTY</code> - Update inventory</li>
+                    <li class="list-group-item"><code>!add_product "name" "description"</code> - Add a new product</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mb-4 border-secondary">
+            <div class="card-header bg-secondary text-white">
+                <i class="fas fa-code me-2"></i>API Endpoints
+            </div>
+            <div class="card-body">
+                <h6>GET Endpoints</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><code>/api/inventory</code> - Get current inventory</li>
+                    <li class="list-group-item"><code>/api/products</code> - Get all products</li>
+                    <li class="list-group-item"><code>/api/order_periods</code> - Get all order periods</li>
+                    <li class="list-group-item"><code>/api/order_periods/current</code> - Get current order period</li>
+                    <li class="list-group-item"><code>/api/orders?period_id=X</code> - Get orders for a period</li>
+                </ul>
+                
+                <h6 class="mt-3">POST Endpoints</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><code>/api/order_periods</code> - Create new order period</li>
+                    <li class="list-group-item"><code>/api/order_periods/&lt;id&gt;/toggle</code> - Toggle order period</li>
+                    <li class="list-group-item"><code>/api/orders</code> - Add/update an order</li>
+                </ul>
+                
+                <h6 class="mt-3">DELETE Endpoints</h6>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><code>/api/orders/&lt;id&gt;</code> - Delete an order</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

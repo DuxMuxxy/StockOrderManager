@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory - Inventory & Order Management{% endblock %}
+
+{% block page_title %}Inventory Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-info mb-4">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-boxes me-2"></i>Current Inventory
+            </div>
+            <div class="card-body">
+                {% if inventory %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Description</th>
+                                <th>Quantity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory %}
+                            <tr>
+                                <td>{{ item.product.id }}</td>
+                                <td>{{ item.product.name }}</td>
+                                <td>{{ item.product.description or 'No description' }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="prepareUpdateInventory({{ item.product.id }}, '{{ item.product.name }}', {{ item.quantity }})">
+                                        <i class="fas fa-edit"></i> Update
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    No inventory items found. Add products and update their quantities.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-clipboard-list me-2"></i>Products
+            </div>
+            <div class="card-body">
+                {% if products %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ product.id }}</td>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.description or 'No description' }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                            onclick="prepareAddToInventory({{ product.id }}, '{{ product.name }}')">
+                                        <i class="fas fa-plus"></i> Add to Inventory
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-warning">
+                    No products found. Add products using the Discord bot command: !add_product "name" "description"
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-edit me-2"></i><span id="inventoryFormTitle">Update Inventory</span>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('update_inventory') }}" method="post">
+                    <input type="hidden" id="product_id" name="product_id" value="">
+                    
+                    <div class="mb-3">
+                        <label for="product_name" class="form-label">Product</label>
+                        <input type="text" class="form-control" id="product_name" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">Quantity</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" 
+                               min="0" value="0" required>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-info-circle me-2"></i>Information
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Managing Inventory</h5>
+                <p class="card-text">
+                    Use this page to view and update the current inventory levels for all products.
+                </p>
+                <ul>
+                    <li>Click <strong>Update</strong> to change the quantity of an existing inventory item</li>
+                    <li>Click <strong>Add to Inventory</strong> to add a product to inventory</li>
+                    <li>You can also use the Discord bot command <code>!update_stock ID QTY</code> to update inventory</li>
+                </ul>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Products can only be added using the Discord bot command: <code>!add_product "name" "description"</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function prepareUpdateInventory(productId, productName, quantity) {
+        document.getElementById('inventoryFormTitle').textContent = 'Update Inventory';
+        document.getElementById('product_id').value = productId;
+        document.getElementById('product_name').value = productName;
+        document.getElementById('quantity').value = quantity;
+    }
+    
+    function prepareAddToInventory(productId, productName) {
+        document.getElementById('inventoryFormTitle').textContent = 'Add to Inventory';
+        document.getElementById('product_id').value = productId;
+        document.getElementById('product_name').value = productName;
+        document.getElementById('quantity').value = 0;
+    }
+</script>
+{% endblock %}

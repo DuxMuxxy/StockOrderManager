@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block title %}Orders - Inventory & Order Management{% endblock %}
+
+{% block page_title %}Order Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-success mb-4">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <div>
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    {% if period %}
+                        Orders for {{ period.month }}/{{ period.year }}
+                        {% if period.is_open %}
+                            <span class="badge bg-info ms-2">OPEN</span>
+                        {% else %}
+                            <span class="badge bg-secondary ms-2">CLOSED</span>
+                        {% endif %}
+                    {% else %}
+                        No Period Selected
+                    {% endif %}
+                </div>
+                <div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle" type="button" 
+                                id="periodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Change Period
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="periodDropdown">
+                            {% for p in periods %}
+                            <li>
+                                <a class="dropdown-item{% if period and period.id == p.id %} active{% endif %}" 
+                                   href="{{ url_for('orders', period_id=p.id) }}">
+                                    {{ p.month }}/{{ p.year }}
+                                    {% if p.is_open %}<span class="badge bg-info ms-1">OPEN</span>{% endif %}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if period %}
+                    {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Items</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.user_name }}</td>
+                                    <td>
+                                        <ul class="list-unstyled mb-0">
+                                            {% for item in order.items %}
+                                            <li>{{ item.product.name }}: {{ item.quantity }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </td>
+                                    <td>
+                                        {% if period.is_open %}
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                    onclick="prepareEditOrder('{{ order.user_id }}', '{{ order.user_name }}', {{ order.id }})">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <form action="{{ url_for('delete_order', order_id=order.id) }}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Are you sure you want to delete this order?')">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">Period closed</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No orders found for this period.
+                    </div>
+                    {% endif %}
+                {% else %}
+                <div class="alert alert-warning">
+                    No order period selected. Please select a period from the dropdown menu.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        {% if current_period %}
+        <div class="card border-primary mb-4">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-plus-circle me-2"></i>Add/Edit Order
+            </div>
+            <div class="card-body">
+                <form id="orderForm" action="{{ url_for('add_order') }}" method="post">
+                    <input type="hidden" id="editing_order_id" name="editing_order_id" value="">
+                    
+                    <div class="mb-3">
+                        <label for="user_name" class="form-label">User Name</label>
+                        <input type="text" class="form-control" id="user_name" name="user_name" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">User ID (optional)</label>
+                        <input type="text" class="form-control" id="user_id" name="user_id" 
+                               placeholder="Will default to username if empty">
+                    </div>
+                    
+                    <h5 class="mt-4 mb-3">Products</h5>
+                    <div id="orderItems">
+                        {% for product in products %}
+                        <div class="mb-3 row">
+                            <div class="col-8">
+                                <label class="form-label">{{ product.name }}</label>
+                                <input type="hidden" name="product_id[]" value="{{ product.id }}">
+                            </div>
+                            <div class="col-4">
+                                <input type="number" class="form-control" name="quantity[]" 
+                                       min="0" value="0" required>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            No open order period available. Please open an order period first.
+        </div>
+        {% endif %}
+        
+        <div class="card border-info">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-info-circle me-2"></i>Information
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Managing Orders</h5>
+                <p class="card-text">
+                    Use this page to view, add, edit, and delete orders for each order period.
+                </p>
+                <ul>
+                    <li>Select different periods using the dropdown menu</li>
+                    <li>Add new orders for the currently open period</li>
+                    <li>Edit or delete existing orders (only for open periods)</li>
+                    <li>Set at least 1 for quantity to include a product in the order</li>
+                </ul>
+                
+                <div class="alert alert-light border mt-3">
+                    <strong>Note:</strong> A user can only have one order per period. Adding a new order for a user who already has one will update their existing order.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function prepareEditOrder(userId, userName, orderId) {
+        document.getElementById('user_id').value = userId;
+        document.getElementById('user_name').value = userName;
+        document.getElementById('editing_order_id').value = orderId;
+        
+        // Reset all quantities to 0
+        const quantityInputs = document.querySelectorAll('input[name="quantity[]"]');
+        quantityInputs.forEach(input => {
+            input.value = 0;
+        });
+        
+        // Fetch the order details to populate the form
+        fetch(`/api/orders?period_id={{ period.id if period else '' }}`)
+            .then(response => response.json())
+            .then(orders => {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.items.forEach(item => {
+                        const productId = item.product_id;
+                        const quantity = item.quantity;
+                        
+                        // Find the input for this product and set its value
+                        const inputs = document.querySelectorAll('input[name="product_id[]"]');
+                        for (let i = 0; i < inputs.length; i++) {
+                            if (parseInt(inputs[i].value) === productId) {
+                                const quantityInput = inputs[i].closest('.row').querySelector('input[name="quantity[]"]');
+                                quantityInput.value = quantity;
+                                break;
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching order details:', error));
+    }
+</script>
+{% endblock %}
