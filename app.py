@@ -51,6 +51,76 @@ with app.app_context():
 def index():
     return render_template('index.html')
 
+@app.route('/products')
+def products():
+    products_list = Product.query.all()
+    return render_template('products.html', products=products_list)
+
+@app.route('/products/add', methods=['POST'])
+def add_product():
+    name = request.form.get('name')
+    description = request.form.get('description', '')
+    
+    if not name:
+        flash('Product name is required', 'danger')
+        return redirect(url_for('products'))
+    
+    # Check if product already exists
+    existing = Product.query.filter_by(name=name).first()
+    if existing:
+        flash(f'A product with the name "{name}" already exists', 'danger')
+        return redirect(url_for('products'))
+    
+    # Create new product
+    product = Product(name=name, description=description)
+    db.session.add(product)
+    db.session.commit()
+    
+    flash(f'Product "{name}" added successfully', 'success')
+    return redirect(url_for('products'))
+
+@app.route('/products/update', methods=['POST'])
+def update_product():
+    product_id = request.form.get('editing_product_id', type=int)
+    name = request.form.get('name')
+    description = request.form.get('description', '')
+    
+    if not product_id or not name:
+        flash('Invalid input data', 'danger')
+        return redirect(url_for('products'))
+    
+    product = Product.query.get_or_404(product_id)
+    
+    # Check if name already exists for another product
+    existing = Product.query.filter(Product.name == name, Product.id != product_id).first()
+    if existing:
+        flash(f'A product with the name "{name}" already exists', 'danger')
+        return redirect(url_for('products'))
+    
+    product.name = name
+    product.description = description
+    db.session.commit()
+    
+    flash(f'Product "{name}" updated successfully', 'success')
+    return redirect(url_for('products'))
+
+@app.route('/products/<int:product_id>/delete', methods=['POST'])
+def delete_product(product_id):
+    product = Product.query.get_or_404(product_id)
+    
+    # Delete associated inventory items
+    Inventory.query.filter_by(product_id=product_id).delete()
+    
+    # Delete associated order items
+    OrderItem.query.filter_by(product_id=product_id).delete()
+    
+    # Delete the product
+    db.session.delete(product)
+    db.session.commit()
+    
+    flash(f'Product "{product.name}" and all related inventory/order items have been deleted', 'success')
+    return redirect(url_for('products'))
+
 @app.route('/inventory')
 def inventory():
     inventory_items = get_current_inventory()
