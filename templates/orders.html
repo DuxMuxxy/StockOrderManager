@@ -51,6 +51,7 @@
                                 <tr>
                                     <th>User</th>
                                     <th>Items</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -66,9 +67,23 @@
                                         </ul>
                                     </td>
                                     <td>
-                                        {% if period.is_open %}
+                                        {% if order.is_delivered %}
+                                            <span class="badge bg-success">Delivered</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Not Delivered</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                            <form action="{{ url_for('toggle_order_delivery', order_id=order.id) }}{% if period and period.id %}?period_id={{ period.id }}{% endif %}" method="post" class="d-inline me-1">
+                                                <button type="submit" class="btn btn-sm {% if order.is_delivered %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                                    <i class="fas {% if order.is_delivered %}fa-times{% else %}fa-check{% endif %}"></i>
+                                                    {% if order.is_delivered %}Mark as Not Delivered{% else %}Mark as Delivered{% endif %}
+                                                </button>
+                                            </form>
+                                            
+                                            {% if period.is_open %}
+                                            <button type="button" class="btn btn-sm btn-outline-primary me-1"
                                                     onclick="prepareEditOrder('{{ order.user_id }}', '{{ order.user_name }}', {{ order.id }})">
                                                 <i class="fas fa-edit"></i> Edit
                                             </button>
@@ -78,10 +93,10 @@
                                                     <i class="fas fa-trash"></i> Delete
                                                 </button>
                                             </form>
+                                            {% else %}
+                                            <span class="text-muted">Period closed (edit disabled)</span>
+                                            {% endif %}
                                         </div>
-                                        {% else %}
-                                        <span class="text-muted">Period closed</span>
-                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}

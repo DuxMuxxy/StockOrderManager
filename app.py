@@ -459,6 +459,7 @@ def api_orders():
             'id': order.id,
             'user_id': order.user_id,
             'user_name': order.user_name,
+            'is_delivered': order.is_delivered,
             'items': items
         })
     
@@ -522,6 +523,7 @@ def api_add_order():
         'id': order.id,
         'user_id': order.user_id,
         'user_name': order.user_name,
+        'is_delivered': order.is_delivered,
         'order_period_id': order.order_period_id
     }), 201
 
