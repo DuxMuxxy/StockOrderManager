@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 import asyncio
 from datetime import datetime
+from dotenv import load_dotenv
 
 # Create app context for database access
 import app
@@ -17,6 +18,8 @@ from utils import (
     toggle_order_period,
     update_inventory
 )
+
+load_dotenv()
 
 # Set up intents
 intents = discord.Intents.default()
